@@ -1,38 +1,61 @@
-﻿using SteamInventoryNotifier.Model;
+﻿using SteamInventoryNotifier.Interfaces;
+using SteamInventoryNotifier.Model;
+using SteamInventoryNotifier.Notifiers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
+using System.Windows;
 using System.Windows.Input;
 
 namespace SteamInventoryNotifier.ViewModel
-{ 
+{
     public class MainViewModel
     {
         #region private API
         private readonly INotifier _notifier = new TelegramNotifier();
-        private readonly SteamInventoryLoader _loader = new SteamInventoryLoader();
+        private readonly SteamInventoryGrabber _loader = new SteamInventoryGrabber();
         #endregion
 
+        #region UI
         public GrabbingModel GrabbingModel { get; set; } = new GrabbingModel();
 
-        public ICommand SubmitParametersCommand => new BaseCommand(OnSubmitParametersClick);
+        public ICommand SubmitParametersCommand => new BaseCommand((object data) => SendRequest());
+        #endregion
+
+        private readonly Timer InventoryRequestTimer;
 
         public MainViewModel()
         {
-            var timer = new System.Timers.Timer(30000)
+            GrabbingModel.OnFrequencyChanged += OnFrequencyChanged;
+
+            InventoryRequestTimer = new Timer(GrabbingModel.Frequency)
             {
                 AutoReset = true,
                 Enabled = true
             };
-            timer.Elapsed += OnTimerTick;
+            InventoryRequestTimer.Elapsed += (object sender, ElapsedEventArgs e) => SendRequest();
+        }
+
+        private void OnFrequencyChanged(int frequency)
+        {
+            if (InventoryRequestTimer.Enabled)
+            {
+                InventoryRequestTimer.Stop();
+            }
+            InventoryRequestTimer.Interval = frequency;
+            InventoryRequestTimer.Start();
         }
 
         private void SendRequest()
         {
-            var inventory = _loader.GetInventory(GrabbingModel.ProfileId, "730");
-            if (inventory.Total != GrabbingModel.LastFetchItemsQuantity && !string.IsNullOrEmpty(GrabbingModel.ProfileId))
+            if (GrabbingModel.ProfileId != default)
+            {
+                //TODO: validation
+                return;
+            }
+
+            var inventory = _loader.GetInventory(GrabbingModel.ProfileId, GrabbingModel.AppId);
+            if (inventory.Total != GrabbingModel.LastFetchItemsQuantity && GrabbingModel.ProfileId != default)
             {
                 SendNotification(inventory);
             }
@@ -40,7 +63,7 @@ namespace SteamInventoryNotifier.ViewModel
             GrabbingModel.LastFetchItemsQuantity = inventory.Total;
         }
 
-        private void SendNotification(InventoryResponse inventoryResponse)
+        private bool SendNotification(InventoryResponse inventoryResponse)
         {
             var newestItem = inventoryResponse.Descriptions.FirstOrDefault();
             if (newestItem != null)
@@ -49,23 +72,15 @@ namespace SteamInventoryNotifier.ViewModel
                     newestItem.MarketHashName,
                     newestItem.IconHash,
                     DateTime.Now);
-                _notifier.Notify(message);
+                var notificationError = _notifier.Notify(message);
+                var hasErrors = string.IsNullOrEmpty(notificationError);
+                if (hasErrors)
+                {
+                    MessageBox.Show(notificationError);
+                }
+                return !hasErrors;
             }
+            return true;
         }
-
-        #region events implementation
-        private void OnTimerTick(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            SendRequest();
-        }
-
-        private void OnSubmitParametersClick(object eventData)
-        {
-            if (!string.IsNullOrEmpty(GrabbingModel.ProfileId))
-            {
-                SendRequest();
-            }
-        }
-        #endregion
     }
 }

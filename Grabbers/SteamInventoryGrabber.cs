@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SteamInventoryNotifier.Http;
 using SteamInventoryNotifier.Model;
 using System;
 using System.Collections.Generic;
@@ -9,16 +10,14 @@ using System.Threading.Tasks;
 
 namespace SteamInventoryNotifier
 {
-    public class SteamInventoryLoader
+    public class SteamInventoryGrabber
     {
         private readonly string _apiUrl = "https://steamcommunity.com/inventory";
         
-        public InventoryResponse GetInventory(string userId, string appId)
+        public InventoryResponse GetInventory(long userId, int appId)
         {
             var url = $"{_apiUrl}/{userId}/{appId}/2";
-
-            var requester = new Requester();
-            var response = requester.SendDefaultRequest(url);
+            var response = new HttpRequestHelper().SendGet(url);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -26,6 +25,7 @@ namespace SteamInventoryNotifier
             }
             else
             {
+                //TOOD: log it
                 Console.WriteLine("An error occured while inventory fetch");
                 return null;
             }

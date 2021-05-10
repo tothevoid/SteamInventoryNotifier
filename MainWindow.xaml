@@ -22,23 +22,27 @@
         <Style x:Key="InputCaption"  TargetType="Label">
             <Setter Property="Width" Value="75"/>
         </Style>
+        <Style x:Key="FieldGroup"  TargetType="StackPanel">
+            <Setter Property="Margin" Value="0, 5"/>
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
-            <StackPanel Orientation="Vertical" Visibility="{Binding GrabbingModel.Output, Converter={StaticResource NullToVis}}">
+            <StackPanel Orientation="Vertical" Visibility="{Binding GrabbingResultModel.Output, Converter={StaticResource NullToVis}}">
                 <Label HorizontalAlignment="Center" Content="Output:"/>
-                <Label HorizontalAlignment="Center" Margin="0,0,0,40" Content="{Binding GrabbingModel.Output}"/>
+                <Label HorizontalAlignment="Center" Margin="0,0,0,40" Content="{Binding GrabbingResultModel.Output}"/>
             </StackPanel>
-            <StackPanel Margin="0, 5" Orientation="Horizontal">
-                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">App ID:</Label>
+            <StackPanel Style="{StaticResource FieldGroup}">
+                <Label Style="{StaticResource InputCaption}">App ID:</Label>
                 <TextBox Text="{Binding GrabbingModel.AppId}"/>
             </StackPanel>
-            <StackPanel Margin="0, 5" Orientation="Horizontal">
-                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">Steam ID</Label>
+            <StackPanel Style="{StaticResource FieldGroup}">
+                <Label Style="{StaticResource InputCaption}">Steam ID:</Label>
                 <TextBox Text="{Binding GrabbingModel.ProfileId}"/>
             </StackPanel>
-            <StackPanel Margin="0, 5" Orientation="Horizontal">
-                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">Frequency, s</Label>
+            <StackPanel Style="{StaticResource FieldGroup}">
+                <Label Style="{StaticResource InputCaption}">Frequency, s:</Label>
                 <TextBox Text="{Binding GrabbingModel.Frequency}"/>
             </StackPanel>
             <Border Margin="0,15,0,0"  Background="#171a21" CornerRadius="10" BorderBrush="Transparent" BorderThickness="2">

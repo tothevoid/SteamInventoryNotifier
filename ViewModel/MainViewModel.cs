@@ -17,7 +17,9 @@ namespace SteamInventoryNotifier.ViewModel
         #endregion
 
         #region UI
-        public GrabbingModel GrabbingModel { get; set; } = new GrabbingModel();
+        public GrabbingParametersModel GrabbingModel { get; set; } = new GrabbingParametersModel();
+
+        public GrabbingResultModel GrabbingResultModel { get; set; } = new GrabbingResultModel();
 
         public ICommand SubmitParametersCommand => new BaseCommand((object data) => SendRequest());
         #endregion
@@ -33,7 +35,9 @@ namespace SteamInventoryNotifier.ViewModel
                 AutoReset = true,
                 Enabled = true
             };
-            InventoryRequestTimer.Elapsed += (object sender, ElapsedEventArgs e) => SendRequest();
+            InventoryRequestTimer.Elapsed += (object sender, ElapsedEventArgs e) => SendRequest(false);
+
+            SendRequest(false);
         }
 
         private void OnFrequencyChanged(int frequency)
@@ -46,30 +50,34 @@ namespace SteamInventoryNotifier.ViewModel
             InventoryRequestTimer.Start();
         }
 
-        private void SendRequest()
+        private void SendRequest(bool notifyValidation = true)
         {
-            if (GrabbingModel.ProfileId == default)
+            var validationResult = GrabbingModel.Validate();
+            if (!string.IsNullOrEmpty(validationResult))
             {
-                //TODO: validation
+                if (notifyValidation)
+                {
+                    MessageBox.Show(validationResult);
+                }
                 return;
-            }
+            }            
 
             var inventory = _loader.GetInventory(GrabbingModel.ProfileId, GrabbingModel.AppId);
             if (inventory == null)
             {
-                GrabbingModel.WriteInOutput("Failed to request inventory");
+                GrabbingResultModel.WriteInOutput("Failed to request inventory");
                 return;
             } 
             else
             {
-                GrabbingModel.WriteInOutput($"Successfully fetched {inventory.Total} items");
+                GrabbingResultModel.WriteInOutput($"Successfully fetched {inventory.Total} items");
             }
 
-            if (inventory.Total != GrabbingModel.LastFetchItemsQuantity)
+            if (inventory.Total != GrabbingResultModel.LastFetchItemsQuantity)
             {
                 SendNotification(inventory);
             }
-            GrabbingModel.LastFetchItemsQuantity = inventory.Total;
+            GrabbingResultModel.LastFetchItemsQuantity = inventory.Total;
         }
 
         private bool SendNotification(InventoryResponse inventoryResponse)

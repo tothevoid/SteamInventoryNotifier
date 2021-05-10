@@ -2,6 +2,7 @@
 using SteamInventoryNotifier.Model;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -18,15 +19,19 @@ namespace SteamInventoryNotifier
         private readonly string _chatId;
         public TelegramNotifier()
         {
-            //TODO: config implementation
+            _token = ConfigurationManager.AppSettings["TelegramToken"].ToString();
+            _chatId = ConfigurationManager.AppSettings["TeelgramBotId"].ToString();
+
+            if (string.IsNullOrEmpty(_token) || string.IsNullOrEmpty(_chatId))
+            {
+                throw new ConfigurationErrorsException("There is no telegram api key or chat id");
+            }
         }
 
         public bool Notify(NotificationMessage message)
         {
             var msg = $"<b>You've got a new item: {message.ItemName}</b>";
             var imageLink = $"<a href=\"{message.ImageLink}\">&#8205;</a>";
-
-            var requester = new Requester();
             var url = $"{_telegramUrl}/bot{_token}/sendMessage";
 
             var payload = new TelegramPayload
@@ -61,7 +66,6 @@ namespace SteamInventoryNotifier
                 Console.WriteLine($"An exception occured {ex.Message}");
                 return false;
             }
-           
         }
     }
 }

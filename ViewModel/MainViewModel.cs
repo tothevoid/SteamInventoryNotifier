@@ -28,7 +28,7 @@ namespace SteamInventoryNotifier.ViewModel
         {
             GrabbingModel.OnFrequencyChanged += OnFrequencyChanged;
 
-            InventoryRequestTimer = new Timer(GrabbingModel.Frequency)
+            InventoryRequestTimer = new Timer(GrabbingModel.Frequency * 1000)
             {
                 AutoReset = true,
                 Enabled = true
@@ -42,7 +42,7 @@ namespace SteamInventoryNotifier.ViewModel
             {
                 InventoryRequestTimer.Stop();
             }
-            InventoryRequestTimer.Interval = frequency;
+            InventoryRequestTimer.Interval = frequency * 1000;
             InventoryRequestTimer.Start();
         }
 

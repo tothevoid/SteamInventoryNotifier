@@ -21,7 +21,7 @@
             <TextBox Text="{Binding GrabbingModel.AppId}"/>
             <Label HorizontalAlignment="Center">Steam ID</Label>
             <TextBox Text="{Binding GrabbingModel.ProfileId}"/>
-            <Label HorizontalAlignment="Center">Frequency</Label>
+            <Label HorizontalAlignment="Center">Frequency, s</Label>
             <TextBox Text="{Binding GrabbingModel.Frequency}"/>
             <Button Command="{Binding SubmitParametersCommand}" Foreground="White" Background="#171a21">Submit</Button>
         </StackPanel>

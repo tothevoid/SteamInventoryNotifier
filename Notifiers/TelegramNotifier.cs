@@ -37,12 +37,12 @@ namespace SteamInventoryNotifier.Notifiers
                 ChatId = _chatId,
                 Text = $"{msg}{imageLink}",
                 ParseMode = "html",
-                ReplyMarkup = @"{""inline_keyboard"": [[{""text"":""Перейти к объявлению"", ""url"": """ + message.MarketLink + @"""}]]}"
+                ReplyMarkup = @"{""inline_keyboard"": [[{""text"":""Navigate to market"", ""url"": """ + message.MarketLink + @"""}]]}"
             };
 
             string jsonString = JsonConvert.SerializeObject(payload);
 
-            return new HttpRequestHelper().SendPost(_telegramUrl, jsonString);
+            return new HttpRequestHelper().SendPost(url, jsonString);
         }
     }
 }

@@ -20,12 +20,12 @@ namespace SteamInventoryNotifier.Model
         private int lastFetchItemsQuantity;
         public int LastFetchItemsQuantity { get { return lastFetchItemsQuantity; } set { Set(ref lastFetchItemsQuantity, value); } }
 
-        private DateTime lastFetchTime;
-        public string LastFetchDisplayedTime => lastFetchTime != default ? lastFetchTime.ToString("HH:mm:ss") : null;
-
-        public void UpdateDisplayedDate(DateTime value)
+        private string output;
+        public string Output { get { return output; } private set { Set(ref output, value); } }
+    
+        public void WriteInOutput(string message)
         {
-            Set(ref lastFetchTime, value, nameof(LastFetchDisplayedTime));
+            Output = $"{DateTime.Now.ToString("dd.MM HH:mm:ss")} - {message}";
         }
     }
 }

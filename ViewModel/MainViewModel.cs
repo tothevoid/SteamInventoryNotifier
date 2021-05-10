@@ -48,18 +48,27 @@ namespace SteamInventoryNotifier.ViewModel
 
         private void SendRequest()
         {
-            if (GrabbingModel.ProfileId != default)
+            if (GrabbingModel.ProfileId == default)
             {
                 //TODO: validation
                 return;
             }
 
             var inventory = _loader.GetInventory(GrabbingModel.ProfileId, GrabbingModel.AppId);
-            if (inventory.Total != GrabbingModel.LastFetchItemsQuantity && GrabbingModel.ProfileId != default)
+            if (inventory == null)
+            {
+                GrabbingModel.WriteInOutput("Failed to request inventory");
+                return;
+            } 
+            else
+            {
+                GrabbingModel.WriteInOutput($"Successfully fetched {inventory.Total} items");
+            }
+
+            if (inventory.Total != GrabbingModel.LastFetchItemsQuantity)
             {
                 SendNotification(inventory);
             }
-            GrabbingModel.UpdateDisplayedDate(DateTime.Now);
             GrabbingModel.LastFetchItemsQuantity = inventory.Total;
         }
 
@@ -73,14 +82,14 @@ namespace SteamInventoryNotifier.ViewModel
                     newestItem.IconHash,
                     DateTime.Now);
                 var notificationError = _notifier.Notify(message);
-                var hasErrors = string.IsNullOrEmpty(notificationError);
-                if (hasErrors)
+                var isSuccessful = string.IsNullOrEmpty(notificationError);
+                if (!isSuccessful)
                 {
                     MessageBox.Show(notificationError);
                 }
-                return !hasErrors;
+                return isSuccessful;
             }
-            return true;
+            return false;
         }
     }
 }

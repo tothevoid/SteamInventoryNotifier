@@ -9,21 +9,41 @@
         Title="Steam inventory notifier" Height="450" MinWidth="400" Width="800">
     <Window.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVis"/>
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0,0,0,3" />
+            <Setter Property="BorderBrush" Value="#DB003E" />
+            <Setter Property="Width" Value="225" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+        </Style>
+        <Style x:Key="InputCaption"  TargetType="Label">
+            <Setter Property="Width" Value="75"/>
+        </Style>
     </Window.Resources>
     <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="250" Orientation="Vertical">
-            <StackPanel Orientation="Vertical" Visibility="{Binding GrabbingModel.LastFetchDisplayedTime, Converter={StaticResource NullToVis}}">
-                <Label HorizontalAlignment="Center" Content="Last fetched at:"/>
-                <Label HorizontalAlignment="Center" Margin="0,0,0,40" Content="{Binding GrabbingModel.LastFetchDisplayedTime}" 
-                   Visibility="{Binding GrabbingModel.LastFetchDisplayedTime, Converter={StaticResource NullToVis}}"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Visibility="{Binding GrabbingModel.Output, Converter={StaticResource NullToVis}}">
+                <Label HorizontalAlignment="Center" Content="Output:"/>
+                <Label HorizontalAlignment="Center" Margin="0,0,0,40" Content="{Binding GrabbingModel.Output}"/>
             </StackPanel>
-            <Label HorizontalAlignment="Center">App ID</Label>
-            <TextBox Text="{Binding GrabbingModel.AppId}"/>
-            <Label HorizontalAlignment="Center">Steam ID</Label>
-            <TextBox Text="{Binding GrabbingModel.ProfileId}"/>
-            <Label HorizontalAlignment="Center">Frequency, s</Label>
-            <TextBox Text="{Binding GrabbingModel.Frequency}"/>
-            <Button Command="{Binding SubmitParametersCommand}" Foreground="White" Background="#171a21">Submit</Button>
+            <StackPanel Margin="0, 5" Orientation="Horizontal">
+                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">App ID:</Label>
+                <TextBox Text="{Binding GrabbingModel.AppId}"/>
+            </StackPanel>
+            <StackPanel Margin="0, 5" Orientation="Horizontal">
+                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">Steam ID</Label>
+                <TextBox Text="{Binding GrabbingModel.ProfileId}"/>
+            </StackPanel>
+            <StackPanel Margin="0, 5" Orientation="Horizontal">
+                <Label Style="{StaticResource InputCaption}" HorizontalAlignment="Center">Frequency, s</Label>
+                <TextBox Text="{Binding GrabbingModel.Frequency}"/>
+            </StackPanel>
+            <Border Margin="0,15,0,0"  Background="#171a21" CornerRadius="10" BorderBrush="Transparent" BorderThickness="2">
+                <Button FontSize="15" Height="30px" Background="Transparent" Foreground="White" BorderBrush="Transparent" Command="{Binding SubmitParametersCommand}">Update config</Button>
+            </Border>
         </StackPanel>
     </Grid>
 </Window>
